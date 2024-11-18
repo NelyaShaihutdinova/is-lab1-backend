@@ -1,0 +1,8 @@
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="org.hibernate" export="true"/>
+            <module name="javax.persistence.api" export="true"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

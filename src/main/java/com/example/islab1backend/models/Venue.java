@@ -11,7 +11,7 @@ import lombok.Setter;
 @Table(name = "venue")
 @Getter
 @Setter
-public class Venue extends IdEntity{
+public class Venue extends IdEntity {
     @NotNull
     @NotEmpty
     private String name;

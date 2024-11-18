@@ -6,8 +6,9 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
-public class User extends IdEntity{
+@Getter
+@Setter
+public class User extends IdEntity {
     @Column(
             nullable = false,
             unique = true
@@ -19,11 +20,7 @@ public class User extends IdEntity{
     )
     private String password;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "role_id",
-            nullable = false
-    )
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
-
 }

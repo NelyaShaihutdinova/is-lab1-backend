@@ -3,7 +3,27 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
-    <persistence-unit name="default">
-
+    <persistence-unit name="default" transaction-type="JTA">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:/jboss/datasources/postgres</jta-data-source>
+        <class>com.example.islab1backend.models.User</class>
+        <class>com.example.islab1backend.models.AdminRequest</class>
+        <class>com.example.islab1backend.models.Coordinates</class>
+        <class>com.example.islab1backend.models.Event</class>
+        <class>com.example.islab1backend.models.Location</class>
+        <class>com.example.islab1backend.models.Person</class>
+        <class>com.example.islab1backend.models.Ticket</class>
+        <class>com.example.islab1backend.models.Venue</class>
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://is-lab1-backend:5432/your_database"/>
+            <property name="jakarta.persistence.jdbc.user" value="your_user"/>
+            <property name="jakarta.persistence.jdbc.password" value="your_password"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
     </persistence-unit>
 </persistence>
