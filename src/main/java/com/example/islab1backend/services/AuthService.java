@@ -6,17 +6,15 @@ import com.example.islab1backend.models.AdminRequest;
 import com.example.islab1backend.models.AdminRequestStatus;
 import com.example.islab1backend.models.Role;
 import com.example.islab1backend.models.User;
-import com.example.islab1backend.services.interfaces.AuthServiceInterface;
+import com.example.islab1backend.security.JWTUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-import javax.inject.Named;
 import java.util.List;
 
 @ApplicationScoped
-public class AuthService implements AuthServiceInterface {
+public class AuthService {
     @Inject
     private UserDAO userDAO;
 
@@ -24,17 +22,18 @@ public class AuthService implements AuthServiceInterface {
     private AdminRequestDAO adminRequestDAO;
 
     @Transactional
-    public void registerUser(String username, String password, Role role) {
+    public String registerUser(String username, String password, Role role) {
         if (password.length() < 6) {
-            System.out.println("Password must be at least 6 characters");
+            return "Password must be at least 6 characters";
         }
         if (userDAO.findByUsername(username).isPresent()) {
-            System.out.println("Username already exists");
+            return "Username already exists";
         }
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(userDAO.hashPassword(password));
-        user.setRole(role);
+        User user = new User(
+                username,
+                UserDAO.hashPassword(password),
+                role
+        );
 
         if (role == Role.ADMIN && userDAO.getCountOfAdmins() > 0) {
             user.setRole(Role.USER);
@@ -43,13 +42,15 @@ public class AuthService implements AuthServiceInterface {
             adminRequest.setUser(user);
             adminRequest.setStatus(AdminRequestStatus.PENDING);
             adminRequestDAO.save(adminRequest);
+            return "Admin request created";
         } else {
             userDAO.save(user);
+            return JWTUtil.generateToken(user.getUsername());
         }
     }
 
     @Transactional
-    public boolean authenticateUser(String username, String password) {
+    public String getJWTToken(String username, String password) {
         return userDAO.verifyPassword(username, password);
     }
 

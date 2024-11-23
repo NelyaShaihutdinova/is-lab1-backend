@@ -1,13 +1,13 @@
 package com.example.islab1backend.controllers;
 
+import com.example.islab1backend.dto.responses.TokenResponse;
 import com.example.islab1backend.models.User;
 import com.example.islab1backend.services.AuthService;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import jakarta.inject.Inject;
 
 @RequestScoped
 @Path("/auth")
@@ -20,20 +20,18 @@ public class AuthController {
     @POST
     @Path("/login")
     public Response login(User user) {
-        boolean isAuth = authService.authenticateUser(user.getUsername(), user.getPassword());
-        if (isAuth) {
-            return Response.ok().build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
-        }
+        String jwtToken = authService.getJWTToken(user.getUsername(), user.getPassword());
+        return jwtToken.isEmpty() ?
+                Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build()
+                : Response.ok().entity(new TokenResponse(jwtToken)).build();
     }
 
     @POST
     @Path("/register")
     public Response register(User user) {
         try {
-            authService.registerUser(user.getUsername(), user.getPassword(), user.getRole());
-            return Response.ok().build();
+            String jwtToken = authService.registerUser(user.getUsername(), user.getPassword(), user.getRole());
+            return Response.ok().entity(new TokenResponse(jwtToken)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
         }

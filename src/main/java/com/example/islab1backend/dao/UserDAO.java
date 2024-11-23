@@ -2,19 +2,19 @@ package com.example.islab1backend.dao;
 
 import com.example.islab1backend.models.Role;
 import com.example.islab1backend.models.User;
-import jakarta.ejb.Singleton;
+import com.example.islab1backend.security.JWTUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.Optional;
 
 @ApplicationScoped
-public class UserDAO{
+public class UserDAO {
     @PersistenceContext
     private EntityManager em;
 
@@ -49,12 +49,12 @@ public class UserDAO{
                 .getSingleResult();
     }
 
-    public Boolean verifyPassword(String username, String password) {
+    public String verifyPassword(String username, String password) {
         Optional<User> user = findByUsername(username);
-        return user
-                .map(u -> hashPassword(password)
-                        .equals(u.getPassword())
-                )
-                .orElse(false);
+        if (Objects.nonNull(user) && user.map(u -> hashPassword(password)
+                .equals(u.getPassword())).orElse(false)) {
+            return JWTUtil.generateToken(username);
+        }
+        return "";
     }
 }

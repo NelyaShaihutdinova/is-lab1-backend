@@ -28,7 +28,7 @@ public class PersonController {
             personService.createPerson(person);
             return Response.ok().build();
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }
 
