@@ -16,6 +16,11 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        String path = requestContext.getUriInfo().getPath();
+        if (path.equals("api/auth/login") || path.equals("api/auth/register")) {
+            return;
+        }
+
         String authorizationHeader = requestContext.getHeaderString("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {

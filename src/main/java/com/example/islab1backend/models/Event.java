@@ -17,6 +17,9 @@ public class Event extends IdEntity{
     private String name;
 
     @Min(value = 0)
+    @Column(
+            name = "tickets_count"
+    )
     private int ticketsCount;
 
     @Enumerated(EnumType.STRING)

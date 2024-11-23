@@ -20,7 +20,7 @@ public class PersonRequest {
     private Color hairColor;
 
     @NotNull
-    private Location location;
+    private Long location;
 
     @Min(value = 0)
     private long weight;

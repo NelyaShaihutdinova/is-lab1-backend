@@ -19,13 +19,13 @@ public class TicketRequest {
     private String name;
 
     @NotNull
-    private Coordinates coordinates;
+    private Long coordinates;
 
     @NotNull
-    private Person person;
+    private Long person;
 
     @NotNull
-    private Event event;
+    private Long event;
 
     @NotNull
     @Min(value = 0)
@@ -47,5 +47,5 @@ public class TicketRequest {
     private boolean refundable;
 
     @NotNull
-    private Venue venue;
+    private Long venue;
 }

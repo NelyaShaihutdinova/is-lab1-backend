@@ -1,19 +1,23 @@
 package com.example.islab1backend.models;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "audit")
 @Getter
 @Setter
-@MappedSuperclass
-@EntityListeners(CreationInfoListener.class)
-public abstract class CreationInfoEntity extends IdEntity {
+public class AuditEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @Column(
             name = "creation_date",
             nullable = false,
@@ -27,4 +31,10 @@ public abstract class CreationInfoEntity extends IdEntity {
             updatable = false
     )
     private Long creationBy;
+
+    @Column(
+            nullable = false,
+            updatable = false
+    )
+    private String action;
 }

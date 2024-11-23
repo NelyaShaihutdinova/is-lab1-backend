@@ -29,11 +29,10 @@ public class AuthService {
         if (userDAO.findByUsername(username).isPresent()) {
             return "Username already exists";
         }
-        User user = new User(
-                username,
-                UserDAO.hashPassword(password),
-                role
-        );
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(UserDAO.hashPassword(password));
+        user.setRole(role);
 
         if (role == Role.ADMIN && userDAO.getCountOfAdmins() > 0) {
             user.setRole(Role.USER);
