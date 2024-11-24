@@ -45,7 +45,32 @@ public class TicketService {
     }
 
     @Transactional
-    public List<Ticket> getTicketPage(int pageNumber, int pageSize) {
-        return ticketDAO.getPaginatedTicket(pageNumber, pageSize);
+    public List<Ticket> getTicketPage(int pageNumber, int pageSize, String filter, String filterColumn, String sorted) {
+        return ticketDAO.getPaginatedTicket(pageNumber, pageSize, filter, filterColumn, sorted);
+    }
+
+    @Transactional
+    public long getByNumber(float number) {
+        return ticketDAO.getCountOfTicketsByNumber(number);
+    }
+
+    @Transactional
+    public List<Ticket> getByRefundable(boolean refundable) {
+        return ticketDAO.getTicketsByRefundable(refundable);
+    }
+
+    @Transactional
+    public List<Ticket> getByVenue(String venue) {
+        return ticketDAO.getTicketsByVenue(venue);
+    }
+
+    @Transactional
+    public void deleteByEvent(Long eventId, String username) {
+        ticketDAO.cancelEvent(eventId, username);
+    }
+
+    @Transactional
+    public void deleteByPerson(Long personId, String username) {
+        ticketDAO.cancelBookingForPerson(personId, username);
     }
 }

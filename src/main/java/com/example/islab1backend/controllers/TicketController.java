@@ -100,8 +100,62 @@ public class TicketController {
     @GET
     @Path("/show")
     public Response showAllTicket(@QueryParam("page") @DefaultValue("1") int page,
-                                  @QueryParam("size") @DefaultValue("10") int size) {
-        List<Ticket> tickets = ticketService.getTicketPage(page, size);
+                                  @QueryParam("size") @DefaultValue("10") int size,
+                                  @QueryParam("filter-value") String filter,
+                                  @QueryParam("filter-column") String filterColumn,
+                                  @QueryParam("sorted") String sorted
+    ) {
+        List<Ticket> tickets = ticketService.getTicketPage(page, size, filter, filterColumn, sorted);
         return Response.ok(tickets).build();
+    }
+
+    @GET
+    @Path("/by-number")
+    public Response showTicketsByMaxNumber(@QueryParam("number") @DefaultValue("100") float number) {
+        long count = ticketService.getByNumber(number);
+        return Response.ok(count).build();
+    }
+
+    @GET
+    @Path("/by-refundable")
+    public Response showTicketsByMaxRefundable(@QueryParam("refundable") @DefaultValue("true") boolean refundable) {
+        List<Ticket> tickets = ticketService.getByRefundable(refundable);
+        return Response.ok(tickets).build();
+    }
+
+    @GET
+    @Path("/by-venue")
+    public Response showTicketsByMinVenue(@QueryParam("venue") String venueName) {
+        return Response.ok(ticketService.getByVenue(venueName)).build();
+    }
+
+    @POST
+    @Path("/by-event/{id}")
+    public Response deleteTicketsByEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId) {
+        Principal userPrincipal = securityContext.getUserPrincipal();
+        String username = userPrincipal.getName();
+        String action = "delete";
+        try {
+            ticketService.deleteByEvent(eventId, username);
+            auditService.saveAudit(username, action);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
+        }
+    }
+
+    @POST
+    @Path("/by-person/{id}")
+    public Response deleteTicketsByPerson(@Context SecurityContext securityContext, @PathParam("id") Long personId) {
+        Principal userPrincipal = securityContext.getUserPrincipal();
+        String username = userPrincipal.getName();
+        String action = "delete";
+        try {
+            ticketService.deleteByPerson(personId, username);
+            auditService.saveAudit(username, action);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
+        }
     }
 }
