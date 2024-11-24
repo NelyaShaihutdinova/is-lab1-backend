@@ -2,7 +2,6 @@ package com.example.islab1backend.controllers;
 
 import com.example.islab1backend.dto.DTOParser;
 import com.example.islab1backend.dto.requests.PersonRequest;
-import com.example.islab1backend.models.Location;
 import com.example.islab1backend.models.Person;
 import com.example.islab1backend.services.AuditService;
 import com.example.islab1backend.services.LocationService;
@@ -16,6 +15,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/person")
@@ -92,8 +92,9 @@ public class PersonController {
 
     @GET
     @Path("/show")
-    public Response showPerson(@Context SecurityContext securityContext) {
-        return Response.ok(personService.getAllPerson()).build();
+    public Response showAllPerson(@QueryParam("page") @DefaultValue("1") int page,
+                                  @QueryParam("size") @DefaultValue("10") int size) {
+        List<Person> personList = personService.getPersonPage(page, size);
+        return Response.ok(personList).build();
     }
-
 }

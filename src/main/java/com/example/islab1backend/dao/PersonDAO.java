@@ -1,6 +1,7 @@
 package com.example.islab1backend.dao;
 
 import com.example.islab1backend.models.Color;
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Location;
 import com.example.islab1backend.models.Person;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -49,8 +50,11 @@ public class PersonDAO {
         }
     }
 
-    public List<Person> findPerson() {
+    public List<Person> getPaginatedPerson(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Person c", Person.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }

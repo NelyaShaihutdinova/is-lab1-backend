@@ -2,7 +2,7 @@ package com.example.islab1backend.controllers;
 
 import com.example.islab1backend.dto.DTOParser;
 import com.example.islab1backend.dto.requests.TicketRequest;
-import com.example.islab1backend.models.*;
+import com.example.islab1backend.models.Ticket;
 import com.example.islab1backend.services.*;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/ticket")
@@ -98,7 +99,9 @@ public class TicketController {
 
     @GET
     @Path("/show")
-    public Response showTicket(@Context SecurityContext securityContext) {
-        return Response.ok(ticketService.getAllTicket()).build();
+    public Response showAllTicket(@QueryParam("page") @DefaultValue("1") int page,
+                                  @QueryParam("size") @DefaultValue("10") int size) {
+        List<Ticket> tickets = ticketService.getTicketPage(page, size);
+        return Response.ok(tickets).build();
     }
 }

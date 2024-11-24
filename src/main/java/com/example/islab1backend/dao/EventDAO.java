@@ -1,5 +1,6 @@
 package com.example.islab1backend.dao;
 
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Event;
 import com.example.islab1backend.models.EventType;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,8 +46,11 @@ public class EventDAO {
         }
     }
 
-    public List<Event> findEvent() {
+    public List<Event> getPaginatedEvent(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Event c", Event.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }

@@ -2,6 +2,7 @@ package com.example.islab1backend.services;
 
 import com.example.islab1backend.dao.PersonDAO;
 import com.example.islab1backend.models.Color;
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Location;
 import com.example.islab1backend.models.Person;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,7 +41,7 @@ public class PersonService {
     }
 
     @Transactional
-    public List<Person> getAllPerson() {
-        return personDAO.findPerson();
+    public List<Person> getPersonPage(int pageNumber, int pageSize) {
+        return personDAO.getPaginatedPerson(pageNumber, pageSize);
     }
 }

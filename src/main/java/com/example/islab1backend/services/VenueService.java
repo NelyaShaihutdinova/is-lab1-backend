@@ -1,6 +1,7 @@
 package com.example.islab1backend.services;
 
 import com.example.islab1backend.dao.VenueDAO;
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Venue;
 import com.example.islab1backend.models.VenueType;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,7 +39,7 @@ public class VenueService {
     }
 
     @Transactional
-    public List<Venue> getAllVenue() {
-        return venueDAO.findVenue();
+    public List<Venue> getVenuePage(int pageNumber, int pageSize) {
+        return venueDAO.getPaginatedVenue(pageNumber, pageSize);
     }
 }

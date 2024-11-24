@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/location")
@@ -82,7 +83,9 @@ public class LocationController {
 
     @GET
     @Path("/show")
-    public Response showLocation(@Context SecurityContext securityContext) {
-        return Response.ok(locationService.getAllLocation()).build();
+    public Response showAllLocation(@QueryParam("page") @DefaultValue("1") int page,
+                                    @QueryParam("size") @DefaultValue("10") int size) {
+        List<Location> locations = locationService.getLocationPage(page, size);
+        return Response.ok(locations).build();
     }
 }

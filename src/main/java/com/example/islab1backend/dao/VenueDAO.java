@@ -1,5 +1,6 @@
 package com.example.islab1backend.dao;
 
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Venue;
 import com.example.islab1backend.models.VenueType;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -47,8 +48,11 @@ public class VenueDAO {
         }
     }
 
-    public List<Venue> findVenue() {
+    public List<Venue> getPaginatedVenue(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Venue c", Venue.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }

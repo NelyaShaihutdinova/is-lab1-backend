@@ -37,7 +37,7 @@ public class CoordinatesService {
 
 
     @Transactional
-    public List<Coordinates> getAllCoordinates() {
-        return coordinatesDAO.findCoordinates();
+    public List<Coordinates> getCoordinatesPage(int pageNumber, int pageSize) {
+        return coordinatesDAO.getPaginatedCoordinates(pageNumber, pageSize);
     }
 }

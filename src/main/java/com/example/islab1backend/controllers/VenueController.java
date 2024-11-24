@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/venue")
@@ -82,7 +83,9 @@ public class VenueController {
 
     @GET
     @Path("/show")
-    public Response showVenue(@Context SecurityContext securityContext) {
-        return Response.ok(venueService.getAllVenue()).build();
+    public Response showAllVenue(@QueryParam("page") @DefaultValue("1") int page,
+                                 @QueryParam("size") @DefaultValue("10") int size) {
+        List<Venue> venues = venueService.getVenuePage(page, size);
+        return Response.ok(venues).build();
     }
 }

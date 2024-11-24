@@ -1,6 +1,7 @@
 package com.example.islab1backend.services;
 
 import com.example.islab1backend.dao.EventDAO;
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Event;
 import com.example.islab1backend.models.EventType;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,8 +39,8 @@ public class EventService {
     }
 
     @Transactional
-    public List<Event> getAllEvent() {
-        return eventDAO.findEvent();
+    public List<Event> getEventPage(int pageNumber, int pageSize) {
+        return eventDAO.getPaginatedEvent(pageNumber, pageSize);
     }
 
 }

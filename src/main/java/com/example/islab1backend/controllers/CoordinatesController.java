@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/coordinates")
@@ -82,7 +83,9 @@ public class CoordinatesController {
 
     @GET
     @Path("/show")
-    public Response showCoordinates(@Context SecurityContext securityContext) {
-        return Response.ok(coordinatesService.getAllCoordinates()).build();
+    public Response getAllCoordinates(@QueryParam("page") @DefaultValue("1") int page,
+                               @QueryParam("size") @DefaultValue("10") int size){
+        List<Coordinates> coordinates = coordinatesService.getCoordinatesPage(page, size);
+        return Response.ok(coordinates).build();
     }
 }

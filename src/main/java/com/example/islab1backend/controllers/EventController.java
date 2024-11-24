@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequestScoped
 @Path("/event")
@@ -82,7 +83,9 @@ public class EventController {
 
     @GET
     @Path("/show")
-    public Response showEvent(@Context SecurityContext securityContext) {
-        return Response.ok(eventService.getAllEvent()).build();
+    public Response showAllEvent(@QueryParam("page") @DefaultValue("1") int page,
+                                 @QueryParam("size") @DefaultValue("10") int size) {
+        List<Event> events = eventService.getEventPage(page, size);
+        return Response.ok(events).build();
     }
 }

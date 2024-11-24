@@ -45,7 +45,7 @@ public class TicketService {
     }
 
     @Transactional
-    public List<Ticket> getAllTicket() {
-        return ticketDAO.findTicket();
+    public List<Ticket> getTicketPage(int pageNumber, int pageSize) {
+        return ticketDAO.getPaginatedTicket(pageNumber, pageSize);
     }
 }

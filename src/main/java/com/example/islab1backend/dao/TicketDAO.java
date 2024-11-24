@@ -54,8 +54,11 @@ public class TicketDAO {
         }
     }
 
-    public List<Ticket> findTicket() {
+    public List<Ticket> getPaginatedTicket(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Ticket c", Ticket.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }

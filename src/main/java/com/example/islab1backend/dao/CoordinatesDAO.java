@@ -45,8 +45,11 @@ public class CoordinatesDAO {
         }
     }
 
-    public List<Coordinates> findCoordinates() {
+    public List<Coordinates> getPaginatedCoordinates(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Coordinates c", Coordinates.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }

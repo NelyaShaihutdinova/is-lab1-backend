@@ -1,5 +1,6 @@
 package com.example.islab1backend.dao;
 
+import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Location;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -46,8 +47,11 @@ public class LocationDAO {
         }
     }
 
-    public List<Location> findLocation() {
+    public List<Location> getPaginatedLocation(int pageNumber, int pageSize) {
+        int offset = (pageNumber - 1) * pageSize;
         return em.createQuery("SELECT c FROM Location c", Location.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
                 .getResultList();
     }
 }
