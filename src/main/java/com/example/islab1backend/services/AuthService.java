@@ -2,6 +2,7 @@ package com.example.islab1backend.services;
 
 import com.example.islab1backend.dao.AdminRequestDAO;
 import com.example.islab1backend.dao.UserDAO;
+import com.example.islab1backend.dto.responses.TokenWithRoleResponse;
 import com.example.islab1backend.models.AdminRequest;
 import com.example.islab1backend.models.AdminRequestStatus;
 import com.example.islab1backend.models.Role;
@@ -49,7 +50,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String getJWTToken(String username, String password) {
+    public TokenWithRoleResponse getJWTToken(String username, String password) {
         return userDAO.verifyPassword(username, password);
     }
 

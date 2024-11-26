@@ -1,6 +1,7 @@
 package com.example.islab1backend.controllers;
 
 import com.example.islab1backend.dto.responses.TokenResponse;
+import com.example.islab1backend.dto.responses.TokenWithRoleResponse;
 import com.example.islab1backend.models.User;
 import com.example.islab1backend.services.AuthService;
 import jakarta.enterprise.context.RequestScoped;
@@ -20,10 +21,10 @@ public class AuthController {
     @POST
     @Path("/login")
     public Response login(User user) {
-        String jwtToken = authService.getJWTToken(user.getUsername(), user.getPassword());
-        return jwtToken.isEmpty() ?
+        TokenWithRoleResponse tokenResponse = authService.getJWTToken(user.getUsername(), user.getPassword());
+        return tokenResponse == null ?
                 Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build()
-                : Response.ok().entity(new TokenResponse(jwtToken)).build();
+                : Response.ok().entity(tokenResponse).build();
     }
 
     @POST

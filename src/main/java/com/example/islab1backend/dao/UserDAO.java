@@ -1,5 +1,6 @@
 package com.example.islab1backend.dao;
 
+import com.example.islab1backend.dto.responses.TokenWithRoleResponse;
 import com.example.islab1backend.models.Role;
 import com.example.islab1backend.models.User;
 import com.example.islab1backend.security.JWTUtil;
@@ -49,12 +50,13 @@ public class UserDAO {
                 .getSingleResult();
     }
 
-    public String verifyPassword(String username, String password) {
+    public TokenWithRoleResponse verifyPassword(String username, String password) {
         Optional<User> user = findByUsername(username);
         if (Objects.nonNull(user) && user.map(u -> hashPassword(password)
                 .equals(u.getPassword())).orElse(false)) {
-            return JWTUtil.generateToken(username);
+            TokenWithRoleResponse tokenResponse = new TokenWithRoleResponse(user.get().getRole(), JWTUtil.generateToken(username));
+            return tokenResponse;
         }
-        return "";
+        return null;
     }
 }
