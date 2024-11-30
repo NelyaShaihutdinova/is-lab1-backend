@@ -2,6 +2,7 @@ package com.example.islab1backend.dao;
 
 import com.example.islab1backend.models.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -18,6 +19,9 @@ public class TicketDAO {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private UserDAO userDAO;
+
     public void save(Ticket ticket) {
         em.persist(ticket);
     }
@@ -25,7 +29,7 @@ public class TicketDAO {
     public void update(Long ticketId, String name, Coordinates coordinates, Person person, Event event, int price, TicketType ticketType, Long discount, float number, String comment, boolean refundable, Venue venue, String username) {
         Ticket ticket = em.find(Ticket.class, ticketId);
         if (ticket != null) {
-            if (Objects.equals(ticket.getCreationBy(), username)) {
+            if (Objects.equals(ticket.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                 ticket.setName(name);
                 ticket.setCoordinates(coordinates);
                 ticket.setPerson(person);
@@ -52,7 +56,7 @@ public class TicketDAO {
 
     public void delete(Long ticketId, String username) {
         Ticket ticket = findById(ticketId);
-        if (Objects.equals(ticket.getCreationBy(), username)) {
+        if (Objects.equals(ticket.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
             em.remove(ticket);
         } else {
             throw new RuntimeException("You don't have enough rights");
@@ -104,7 +108,7 @@ public class TicketDAO {
 
     public void cancelEvent(Long eventId, String username) {
         Event event = em.find(Event.class, eventId);
-        if (Objects.equals(event.getCreationBy(), username)) {
+        if (Objects.equals(event.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
             em.createQuery("DELETE FROM Ticket t WHERE t.event.id = :eventId")
                     .setParameter("eventId", eventId)
                     .executeUpdate();
@@ -119,7 +123,7 @@ public class TicketDAO {
 
     public void cancelBookingForPerson(Long personId, String username) {
         Person person = em.find(Person.class, personId);
-        if (Objects.equals(person.getCreationBy(), username)) {
+        if (Objects.equals(person.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
             em.createQuery("DELETE FROM Ticket t WHERE t.person.id = :personId")
                     .setParameter("personId", personId)
                     .executeUpdate();

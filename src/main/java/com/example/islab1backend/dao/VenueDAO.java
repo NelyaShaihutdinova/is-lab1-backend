@@ -4,6 +4,7 @@ import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Venue;
 import com.example.islab1backend.models.VenueType;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -15,6 +16,9 @@ public class VenueDAO {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private UserDAO userDAO;
+
     public void save(Venue venue){
         em.persist(venue);
     }
@@ -22,7 +26,7 @@ public class VenueDAO {
     public void update(Long venueId, String name, Long capacity, VenueType venueType, String username) {
         Venue venue = em.find(Venue.class, venueId);
         if (venue != null) {
-            if (Objects.equals(venue.getCreationBy(), username)) {
+            if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                 venue.setName(name);
                 venue.setCapacity(capacity);
                 venue.setVenueType(venueType);
@@ -41,7 +45,7 @@ public class VenueDAO {
 
     public void delete(Long venueId, String username) {
         Venue venue = findById(venueId);
-        if (Objects.equals(venue.getCreationBy(), username)) {
+        if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
             em.remove(venue);
         } else {
             throw new RuntimeException("You don't have enough rights");

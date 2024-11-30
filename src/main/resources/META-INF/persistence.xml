@@ -16,9 +16,9 @@
         <class>com.example.islab1backend.models.Venue</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://is-lab1-backend:5432/your_database"/>
-            <property name="jakarta.persistence.jdbc.user" value="your_user"/>
-            <property name="jakarta.persistence.jdbc.password" value="your_password"/>
+            <property name="jakarta.persistence.jdbc.url" value="${DB_URL}"/>
+            <property name="jakarta.persistence.jdbc.user" value="${DB_USER}"/>
+            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>

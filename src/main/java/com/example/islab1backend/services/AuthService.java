@@ -42,7 +42,7 @@ public class AuthService {
             adminRequest.setUser(user);
             adminRequest.setStatus(AdminRequestStatus.PENDING);
             adminRequestDAO.save(adminRequest);
-            return "Admin request created";
+            return JWTUtil.generateToken(user.getUsername());
         } else {
             userDAO.save(user);
             return JWTUtil.generateToken(user.getUsername());

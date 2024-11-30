@@ -4,6 +4,7 @@ import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Event;
 import com.example.islab1backend.models.EventType;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -15,6 +16,9 @@ public class EventDAO {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private UserDAO userDAO;
+
     public void save(Event event) {
         em.persist(event);
     }
@@ -22,7 +26,7 @@ public class EventDAO {
     public void update(Long eventId, String name, EventType eventType, int ticketsCount, String username) {
         Event event = em.find(Event.class, eventId);
         if (event != null) {
-            if (Objects.equals(event.getCreationBy(), username)) {
+            if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                 event.setName(name);
                 event.setEventType(eventType);
                 event.setTicketsCount(ticketsCount);
@@ -41,7 +45,7 @@ public class EventDAO {
 
     public void delete(Long eventId, String username) {
         Event event = findById(eventId);
-        if (Objects.equals(event.getCreationBy(), username)) {
+        if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
             em.remove(event);
         }
     }
