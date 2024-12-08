@@ -1,5 +1,6 @@
 package com.example.islab1backend.controllers;
 
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.dto.responses.TokenResponse;
 import com.example.islab1backend.dto.responses.TokenWithRoleResponse;
 import com.example.islab1backend.models.User;
@@ -33,6 +34,8 @@ public class AuthController {
         try {
             String jwtToken = authService.registerUser(user.getUsername(), user.getPassword(), user.getRole());
             return Response.ok().entity(new TokenResponse(jwtToken)).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid username or password").build();
         }

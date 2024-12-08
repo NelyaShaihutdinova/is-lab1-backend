@@ -1,5 +1,6 @@
 package com.example.islab1backend.controllers;
 
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.services.AuditService;
 import com.example.islab1backend.services.CoordinatesService;
@@ -28,14 +29,16 @@ public class CoordinatesController {
     @POST
     @Path("/create")
     public Response createCoordinates(@Context SecurityContext securityContext, Coordinates coordinates) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        coordinates.setCreationBy(username);
-        String action = "create";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            coordinates.setCreationBy(username);
+            String action = "create";
             coordinatesService.createCoordinates(coordinates);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -44,13 +47,15 @@ public class CoordinatesController {
     @POST
     @Path("/update/{id}")
     public Response updateCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId, Coordinates coordinates) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "update";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "update";
             coordinatesService.updateCoordinates(coordinatesId, coordinates, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -69,14 +74,16 @@ public class CoordinatesController {
     @POST
     @Path("/delete/{id}")
     public Response deleteCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             coordinatesService.deleteCoordinates(coordinatesId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }

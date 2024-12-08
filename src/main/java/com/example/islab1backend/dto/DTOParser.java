@@ -8,6 +8,9 @@ import com.example.islab1backend.services.*;
 public class DTOParser {
     public Person parsePersonWithLocation(PersonRequest personRequest, LocationService locationService, String username) {
         Location location = locationService.getLocation(personRequest.getLocation());
+        if (location == null) {
+            throw new IllegalArgumentException("Location not found");
+        }
         Person person = new Person();
         person.setEyeColor(personRequest.getEyeColor());
         person.setHairColor(personRequest.getHairColor());
@@ -20,9 +23,21 @@ public class DTOParser {
     public Ticket parseTicket(TicketRequest ticketRequest, VenueService venueService, PersonService personService, CoordinatesService coordinatesService, EventService eventService, String username) {
         Ticket ticket = new Ticket();
         Coordinates coordinates = coordinatesService.getCoordinates(ticketRequest.getCoordinates());
+        if (coordinates == null) {
+            throw new IllegalArgumentException("Coordinates not found");
+        }
         Event event = eventService.getEvent(ticketRequest.getEvent());
+        if (event == null) {
+            throw new IllegalArgumentException("Event not found");
+        }
         Venue venue = venueService.getVenue(ticketRequest.getVenue());
+        if (venue == null) {
+            throw new IllegalArgumentException("Venue not found");
+        }
         Person person = personService.getPerson(ticketRequest.getPerson());
+        if (person == null) {
+            throw new IllegalArgumentException("Person not found");
+        }
         ticket.setName(ticketRequest.getName());
         ticket.setCoordinates(coordinates);
         ticket.setPerson(person);

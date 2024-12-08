@@ -2,6 +2,7 @@ package com.example.islab1backend.controllers;
 
 import com.example.islab1backend.dto.DTOParser;
 import com.example.islab1backend.dto.requests.TicketRequest;
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.models.Ticket;
 import com.example.islab1backend.services.*;
 import jakarta.enterprise.context.RequestScoped;
@@ -43,14 +44,16 @@ public class TicketController {
     @POST
     @Path("/create")
     public Response createTicket(@Context SecurityContext securityContext, TicketRequest ticketRequest) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
-        String action = "create";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
+            String action = "create";
             ticketService.createTicket(ticket);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -59,14 +62,16 @@ public class TicketController {
     @POST
     @Path("/update/{id}")
     public Response updateTicket(@Context SecurityContext securityContext, @PathParam("id") Long ticketId, TicketRequest ticketRequest) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
-        String action = "update";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
+            String action = "update";
             ticketService.updateTicket(ticketId, ticket, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -85,13 +90,15 @@ public class TicketController {
     @POST
     @Path("/delete/{id}")
     public Response deleteTicket(@Context SecurityContext securityContext, @PathParam("id") Long ticketId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             ticketService.deleteTicket(ticketId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -132,13 +139,15 @@ public class TicketController {
     @POST
     @Path("/by-event/{id}")
     public Response deleteTicketsByEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             ticketService.deleteByEvent(eventId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -147,13 +156,15 @@ public class TicketController {
     @POST
     @Path("/by-person/{id}")
     public Response deleteTicketsByPerson(@Context SecurityContext securityContext, @PathParam("id") Long personId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             ticketService.deleteByPerson(personId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }

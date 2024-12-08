@@ -2,6 +2,7 @@ package com.example.islab1backend.controllers;
 
 import com.example.islab1backend.dto.DTOParser;
 import com.example.islab1backend.dto.requests.PersonRequest;
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.models.Person;
 import com.example.islab1backend.services.AuditService;
 import com.example.islab1backend.services.LocationService;
@@ -36,14 +37,16 @@ public class PersonController {
     @POST
     @Path("/create")
     public Response createPerson(@Context SecurityContext securityContext, PersonRequest personRequest) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        Person person = parser.parsePersonWithLocation(personRequest, locationService, username);
-        String action = "create";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            Person person = parser.parsePersonWithLocation(personRequest, locationService, username);
+            String action = "create";
             personService.createPerson(person);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -52,14 +55,16 @@ public class PersonController {
     @POST
     @Path("/update/{id}")
     public Response updatePerson(@Context SecurityContext securityContext, @PathParam("id") Long personId, PersonRequest personRequest) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        Person person = parser.parsePersonWithLocation(personRequest, locationService, username);
-        String action = "update";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            Person person = parser.parsePersonWithLocation(personRequest, locationService, username);
+            String action = "update";
             personService.updatePerson(personId, person, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
@@ -78,13 +83,15 @@ public class PersonController {
     @POST
     @Path("/delete/{id}")
     public Response deletePerson(@Context SecurityContext securityContext, @PathParam("id") Long personId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             personService.deletePerson(personId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }

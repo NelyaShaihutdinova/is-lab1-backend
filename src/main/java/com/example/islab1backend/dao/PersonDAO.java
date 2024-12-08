@@ -20,7 +20,7 @@ public class PersonDAO {
     @Inject
     private UserDAO userDAO;
 
-    public void save(Person person){
+    public void save(Person person) {
         em.persist(person);
     }
 
@@ -33,12 +33,11 @@ public class PersonDAO {
                 person.setLocation(location);
                 person.setWeight(weight);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Person not found");
+            throw new IllegalArgumentException("Person with this id not found");
         }
-
     }
 
     public Person findById(Long personId) {
@@ -47,10 +46,14 @@ public class PersonDAO {
 
     public void delete(Long personId, String username) {
         Person person = findById(personId);
-        if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(person);
+        if (person != null) {
+            if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(person);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Person with this id not found");
         }
     }
 

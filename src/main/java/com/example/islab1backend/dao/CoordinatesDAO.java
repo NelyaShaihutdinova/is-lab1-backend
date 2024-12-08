@@ -28,10 +28,10 @@ public class CoordinatesDAO {
                 coordinates.setX(x);
                 coordinates.setY(y);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Coordinates not found");
+            throw new IllegalArgumentException("Coordinates with this id not found");
         }
 
     }
@@ -42,12 +42,17 @@ public class CoordinatesDAO {
 
     public void delete(Long coordinatesId, String username) {
         Coordinates coordinates = findById(coordinatesId);
-        if (Objects.equals(coordinates.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(coordinates);
+        if (coordinates != null) {
+            if (Objects.equals(coordinates.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(coordinates);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Coordinates with this id not found");
         }
     }
+
 
     public List<Coordinates> getPaginatedCoordinates(int pageNumber, int pageSize) {
         int offset = (pageNumber - 1) * pageSize;

@@ -19,7 +19,7 @@ public class VenueDAO {
     @Inject
     private UserDAO userDAO;
 
-    public void save(Venue venue){
+    public void save(Venue venue) {
         em.persist(venue);
     }
 
@@ -31,12 +31,11 @@ public class VenueDAO {
                 venue.setCapacity(capacity);
                 venue.setVenueType(venueType);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Venue not found");
+            throw new IllegalArgumentException("Venue with this id not found");
         }
-
     }
 
     public Venue findById(Long venueId) {
@@ -45,10 +44,14 @@ public class VenueDAO {
 
     public void delete(Long venueId, String username) {
         Venue venue = findById(venueId);
-        if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(venue);
+        if (venue != null) {
+            if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(venue);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Venue with this id not found");
         }
     }
 

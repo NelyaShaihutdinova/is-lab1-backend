@@ -1,5 +1,6 @@
 package com.example.islab1backend.controllers;
 
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.models.Event;
 import com.example.islab1backend.services.AuditService;
 import com.example.islab1backend.services.EventService;
@@ -28,15 +29,17 @@ public class EventController {
     @POST
     @Path("/create")
     public Response createEvent(@Context SecurityContext securityContext, Event event) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        event.setCreationBy(username);
-        String action = "create";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            event.setCreationBy(username);
+            String action = "create";
             eventService.createEvent(event);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }
@@ -44,14 +47,16 @@ public class EventController {
     @POST
     @Path("/update/{id}")
     public Response updateEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId, Event event) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "update";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "update";
             eventService.updateEvent(eventId, event, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }
@@ -69,14 +74,16 @@ public class EventController {
     @POST
     @Path("/delete/{id}")
     public Response deleteEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             eventService.deleteEvent(eventId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }

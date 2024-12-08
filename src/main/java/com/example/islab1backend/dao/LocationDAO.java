@@ -18,7 +18,7 @@ public class LocationDAO {
     @Inject
     private UserDAO userDAO;
 
-    public void save(Location location){
+    public void save(Location location) {
         em.persist(location);
     }
 
@@ -30,12 +30,11 @@ public class LocationDAO {
                 location.setY(y);
                 location.setZ(z);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Location not found");
+            throw new IllegalArgumentException("Location with this id not found");
         }
-
     }
 
     public Location findById(Long locationId) {
@@ -44,10 +43,14 @@ public class LocationDAO {
 
     public void delete(Long locationId, String username) {
         Location location = findById(locationId);
-        if (Objects.equals(location.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(location);
+        if (location != null) {
+            if (Objects.equals(location.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(location);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Location with this id not found");
         }
     }
 

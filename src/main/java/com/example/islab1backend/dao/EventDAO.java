@@ -31,12 +31,11 @@ public class EventDAO {
                 event.setEventType(eventType);
                 event.setTicketsCount(ticketsCount);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Event not found");
+            throw new IllegalArgumentException("Event with this id not found");
         }
-
     }
 
     public Event findById(Long eventId) {
@@ -45,8 +44,14 @@ public class EventDAO {
 
     public void delete(Long eventId, String username) {
         Event event = findById(eventId);
-        if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(event);
+        if (event != null) {
+            if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(event);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
+        } else {
+            throw new IllegalArgumentException("Event with this id not found");
         }
     }
 

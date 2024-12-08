@@ -42,10 +42,10 @@ public class TicketDAO {
                 ticket.setRefundable(refundable);
                 ticket.setVenue(venue);
             } else {
-                throw new RuntimeException("You don't have enough rights");
+                throw new IllegalArgumentException("You don't have enough rights");
             }
         } else {
-            throw new RuntimeException("Ticket not found");
+            throw new IllegalArgumentException("Ticket with this id not found");
         }
 
     }
@@ -56,10 +56,14 @@ public class TicketDAO {
 
     public void delete(Long ticketId, String username) {
         Ticket ticket = findById(ticketId);
-        if (Objects.equals(ticket.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.remove(ticket);
+        if (ticket != null) {
+            if (Objects.equals(ticket.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.remove(ticket);
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Ticket with this id not found");
         }
     }
 
@@ -108,27 +112,35 @@ public class TicketDAO {
 
     public void cancelEvent(Long eventId, String username) {
         Event event = em.find(Event.class, eventId);
-        if (Objects.equals(event.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.createQuery("DELETE FROM Ticket t WHERE t.event.id = :eventId")
-                    .setParameter("eventId", eventId)
-                    .executeUpdate();
+        if (event != null) {
+            if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.createQuery("DELETE FROM Ticket t WHERE t.event.id = :eventId")
+                        .setParameter("eventId", eventId)
+                        .executeUpdate();
 
-            em.createQuery("DELETE FROM Event e WHERE e.id = :eventId")
-                    .setParameter("eventId", eventId)
-                    .executeUpdate();
+                em.createQuery("DELETE FROM Event e WHERE e.id = :eventId")
+                        .setParameter("eventId", eventId)
+                        .executeUpdate();
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Event with this id not found");
         }
     }
 
     public void cancelBookingForPerson(Long personId, String username) {
         Person person = em.find(Person.class, personId);
-        if (Objects.equals(person.getCreationBy(), username)  || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-            em.createQuery("DELETE FROM Ticket t WHERE t.person.id = :personId")
-                    .setParameter("personId", personId)
-                    .executeUpdate();
+        if (person != null) {
+            if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                em.createQuery("UPDATE Ticket t SET t.person.id = 0 WHERE t.person.id = :personId")
+                        .setParameter("personId", personId)
+                        .executeUpdate();
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
         } else {
-            throw new RuntimeException("You don't have enough rights");
+            throw new IllegalArgumentException("Person with this id not found");
         }
     }
 }

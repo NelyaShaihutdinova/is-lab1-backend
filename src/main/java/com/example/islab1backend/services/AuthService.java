@@ -24,11 +24,14 @@ public class AuthService {
 
     @Transactional
     public String registerUser(String username, String password, Role role) {
+        if (username.isEmpty()){
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
         if (password.length() < 6) {
-            return "Password must be at least 6 characters";
+            throw new IllegalArgumentException("Password must be at least 6 characters");
         }
         if (userDAO.findByUsername(username).isPresent()) {
-            return "Username already exists";
+            throw new IllegalArgumentException("Username already exists");
         }
         User user = new User();
         user.setUsername(username);

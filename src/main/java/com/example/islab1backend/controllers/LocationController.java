@@ -1,5 +1,6 @@
 package com.example.islab1backend.controllers;
 
+import com.example.islab1backend.dto.responses.ErrorResponse;
 import com.example.islab1backend.models.Location;
 import com.example.islab1backend.services.AuditService;
 import com.example.islab1backend.services.LocationService;
@@ -28,15 +29,17 @@ public class LocationController {
     @POST
     @Path("/create")
     public Response createLocation(@Context SecurityContext securityContext, Location location) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        location.setCreationBy(username);
-        String action = "create";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            location.setCreationBy(username);
+            String action = "create";
             locationService.createLocation(location);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }
@@ -44,14 +47,16 @@ public class LocationController {
     @POST
     @Path("/update/{id}")
     public Response updateLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId, Location location) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "update";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "update";
             locationService.updateLocation(locationId, location, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
-        } catch (Exception e) {
+        }catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+        }  catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
     }
@@ -69,13 +74,15 @@ public class LocationController {
     @POST
     @Path("/delete/{id}")
     public Response deleteLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId) {
-        Principal userPrincipal = securityContext.getUserPrincipal();
-        String username = userPrincipal.getName();
-        String action = "delete";
         try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            String action = "delete";
             locationService.deleteLocation(locationId, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
         }
