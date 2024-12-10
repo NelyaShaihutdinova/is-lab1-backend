@@ -29,8 +29,7 @@ public class Ticket extends IdEntity{
     @ManyToOne
     @JoinColumn(
             name = "person_id",
-            referencedColumnName = "id",
-            nullable = false
+            referencedColumnName = "id"
     )
     private Person person;
 

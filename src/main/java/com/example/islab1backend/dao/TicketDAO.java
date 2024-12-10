@@ -133,7 +133,7 @@ public class TicketDAO {
         Person person = em.find(Person.class, personId);
         if (person != null) {
             if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.createQuery("UPDATE Ticket t SET t.person.id = 0 WHERE t.person.id = :personId")
+                em.createQuery("UPDATE Ticket t SET t.person.id = NULL WHERE t.person.id = :personId")
                         .setParameter("personId", personId)
                         .executeUpdate();
             } else {
