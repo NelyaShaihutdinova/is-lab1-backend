@@ -73,12 +73,13 @@ public class VenueController {
 
     @POST
     @Path("/delete/{id}")
-    public Response deleteVenue(@Context SecurityContext securityContext, @PathParam("id") Long venueId) {
+    public Response deleteVenue(@Context SecurityContext securityContext, @PathParam("id") Long venueId, @QueryParam("replace") String repl) {
+        Long replaceId = Long.parseLong(repl);
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
             String username = userPrincipal.getName();
             String action = "delete";
-            venueService.deleteVenue(venueId, username);
+            venueService.deleteVenue(venueId, username, replaceId);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         } catch (IllegalArgumentException e) {

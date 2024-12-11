@@ -1,6 +1,5 @@
 package com.example.islab1backend.dao;
 
-import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Venue;
 import com.example.islab1backend.models.VenueType;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,13 +41,25 @@ public class VenueDAO {
         return em.find(Venue.class, venueId);
     }
 
-    public void delete(Long venueId, String username) {
+    public void delete(Long venueId, String username, Long replaceId) {
         Venue venue = findById(venueId);
         if (venue != null) {
-            if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.remove(venue);
+            Venue replace = em.find(Venue.class, replaceId);
+            if (replace != null) {
+                if (venueId != replaceId) {
+                    if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                        em.createQuery("UPDATE Ticket t SET t.venue.id = :replaceId WHERE t.venue.id = :venueId")
+                                .setParameter("replaceId", replaceId).setParameter("venueId", venueId)
+                                .executeUpdate();
+                        em.remove(venue);
+                    } else {
+                        throw new IllegalArgumentException("You don't have enough rights");
+                    }
+                } else {
+                    throw new IllegalArgumentException("You delete this venue. Change venue id to replace");
+                }
             } else {
-                throw new IllegalArgumentException("You don't have enough rights");
+                throw new IllegalArgumentException("Venue to replace with this id not found");
             }
         } else {
             throw new IllegalArgumentException("Venue with this id not found");

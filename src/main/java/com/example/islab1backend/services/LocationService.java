@@ -33,8 +33,8 @@ public class LocationService {
     }
 
     @Transactional
-    public void deleteLocation(Long locationId, String username) {
-        locationDAO.delete(locationId, username);
+    public void deleteLocation(Long locationId, String username, Long replaceId) {
+        locationDAO.delete(locationId, username, replaceId);
     }
 
     @Transactional

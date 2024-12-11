@@ -34,8 +34,8 @@ public class VenueService {
     }
 
     @Transactional
-    public void deleteVenue(Long venueId, String username) {
-        venueDAO.delete(venueId, username);
+    public void deleteVenue(Long venueId, String username, Long replaceId) {
+        venueDAO.delete(venueId, username, replaceId);
     }
 
     @Transactional

@@ -34,8 +34,8 @@ public class EventService {
     }
 
     @Transactional
-    public void deleteEvent(Long eventId, String username) {
-        eventDAO.delete(eventId, username);
+    public void deleteEvent(Long eventId, String username, Long replaceId) {
+        eventDAO.delete(eventId, username, replaceId);
     }
 
     @Transactional

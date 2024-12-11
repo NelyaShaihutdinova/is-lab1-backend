@@ -36,8 +36,8 @@ public class PersonService {
     }
 
     @Transactional
-    public void deletePerson(Long personId, String username) {
-        personDAO.delete(personId, username);
+    public void deletePerson(Long personId, String username, Long replaceId) {
+        personDAO.delete(personId, username, replaceId);
     }
 
     @Transactional

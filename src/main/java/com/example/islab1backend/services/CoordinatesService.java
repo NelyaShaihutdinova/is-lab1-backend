@@ -31,8 +31,8 @@ public class CoordinatesService {
     }
 
     @Transactional
-    public void deleteCoordinates(Long coordinatesId, String username) {
-        coordinatesDAO.delete(coordinatesId, username);
+    public void deleteCoordinates(Long coordinatesId, String username, Long replaceId) {
+        coordinatesDAO.delete(coordinatesId, username, replaceId);
     }
 
 

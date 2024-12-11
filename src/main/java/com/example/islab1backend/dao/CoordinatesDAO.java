@@ -1,6 +1,7 @@
 package com.example.islab1backend.dao;
 
 import com.example.islab1backend.models.Coordinates;
+import com.example.islab1backend.models.Coordinates;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -40,13 +41,25 @@ public class CoordinatesDAO {
         return em.find(Coordinates.class, coordinatesId);
     }
 
-    public void delete(Long coordinatesId, String username) {
+    public void delete(Long coordinatesId, String username, Long replaceId) {
         Coordinates coordinates = findById(coordinatesId);
         if (coordinates != null) {
-            if (Objects.equals(coordinates.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.remove(coordinates);
+            Coordinates replace = em.find(Coordinates.class, replaceId);
+            if (replace != null) {
+                if (coordinatesId != replaceId) {
+                    if (Objects.equals(coordinates.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                        em.createQuery("UPDATE Ticket t SET t.coordinates.id = :replaceId WHERE t.coordinates.id = :coordinatesId")
+                                .setParameter("replaceId", replaceId).setParameter("coordinatesId", coordinatesId)
+                                .executeUpdate();
+                        em.remove(coordinates);
+                    } else {
+                        throw new IllegalArgumentException("You don't have enough rights");
+                    }
+                } else {
+                    throw new IllegalArgumentException("You delete this coordinates. Change coordinates id to replace");
+                }
             } else {
-                throw new IllegalArgumentException("You don't have enough rights");
+                throw new IllegalArgumentException("Coordinates to replace with this id not found");
             }
         } else {
             throw new IllegalArgumentException("Coordinates with this id not found");

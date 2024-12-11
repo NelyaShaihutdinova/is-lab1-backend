@@ -44,13 +44,25 @@ public class PersonDAO {
         return em.find(Person.class, personId);
     }
 
-    public void delete(Long personId, String username) {
+    public void delete(Long personId, String username, Long replaceId) {
         Person person = findById(personId);
         if (person != null) {
-            if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.remove(person);
+            Person replace = em.find(Person.class, replaceId);
+            if (replace != null) {
+                if (personId != replaceId) {
+                    if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                        em.createQuery("UPDATE Ticket t SET t.person.id = :replaceId WHERE t.person.id = :personId")
+                                .setParameter("replaceId", replaceId).setParameter("personId", personId)
+                                .executeUpdate();
+                        em.remove(person);
+                    } else {
+                        throw new IllegalArgumentException("You don't have enough rights");
+                    }
+                } else {
+                    throw new IllegalArgumentException("You delete this person. Change person id to replace");
+                }
             } else {
-                throw new IllegalArgumentException("You don't have enough rights");
+                throw new IllegalArgumentException("Person to replace with this id not found");
             }
         } else {
             throw new IllegalArgumentException("Person with this id not found");

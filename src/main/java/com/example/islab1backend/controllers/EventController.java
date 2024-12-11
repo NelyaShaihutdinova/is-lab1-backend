@@ -73,12 +73,13 @@ public class EventController {
 
     @POST
     @Path("/delete/{id}")
-    public Response deleteEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId) {
+    public Response deleteEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId, @QueryParam("replace") String repl) {
+        Long replaceId = Long.parseLong(repl);
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
             String username = userPrincipal.getName();
             String action = "delete";
-            eventService.deleteEvent(eventId, username);
+            eventService.deleteEvent(eventId, username, replaceId);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         }catch (IllegalArgumentException e) {

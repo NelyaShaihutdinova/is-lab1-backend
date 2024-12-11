@@ -73,12 +73,13 @@ public class CoordinatesController {
 
     @POST
     @Path("/delete/{id}")
-    public Response deleteCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId) {
+    public Response deleteCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId, @QueryParam("replace") String repl) {
+        Long replaceId = Long.parseLong(repl);
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
             String username = userPrincipal.getName();
             String action = "delete";
-            coordinatesService.deleteCoordinates(coordinatesId, username);
+            coordinatesService.deleteCoordinates(coordinatesId, username, replaceId);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         }catch (IllegalArgumentException e) {

@@ -3,6 +3,7 @@ package com.example.islab1backend.dao;
 import com.example.islab1backend.models.Coordinates;
 import com.example.islab1backend.models.Event;
 import com.example.islab1backend.models.EventType;
+import com.example.islab1backend.models.Event;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -42,13 +43,25 @@ public class EventDAO {
         return em.find(Event.class, eventId);
     }
 
-    public void delete(Long eventId, String username) {
+    public void delete(Long eventId, String username, Long replaceId) {
         Event event = findById(eventId);
         if (event != null) {
-            if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.remove(event);
+            Event replace = em.find(Event.class, replaceId);
+            if (replace != null) {
+                if (eventId != replaceId) {
+                    if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                        em.createQuery("UPDATE Ticket t SET t.event.id = :replaceId WHERE t.event.id = :eventId")
+                                .setParameter("replaceId", replaceId).setParameter("eventId", eventId)
+                                .executeUpdate();
+                        em.remove(event);
+                    } else {
+                        throw new IllegalArgumentException("You don't have enough rights");
+                    }
+                } else {
+                    throw new IllegalArgumentException("You delete this event. Change event id to replace");
+                }
             } else {
-                throw new IllegalArgumentException("You don't have enough rights");
+                throw new IllegalArgumentException("Event to replace with this id not found");
             }
         } else {
             throw new IllegalArgumentException("Event with this id not found");

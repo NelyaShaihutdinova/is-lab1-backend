@@ -41,13 +41,25 @@ public class LocationDAO {
         return em.find(Location.class, locationId);
     }
 
-    public void delete(Long locationId, String username) {
+    public void delete(Long locationId, String username, Long replaceId) {
         Location location = findById(locationId);
         if (location != null) {
-            if (Objects.equals(location.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
-                em.remove(location);
+            Location replace = em.find(Location.class, replaceId);
+            if (replace != null) {
+                if (locationId != replaceId) {
+                    if (Objects.equals(location.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
+                        em.createQuery("UPDATE Person p SET p.location.id = :replaceId WHERE p.location.id = :locationId")
+                                .setParameter("replaceId", replaceId).setParameter("locationId", locationId)
+                                .executeUpdate();
+                        em.remove(location);
+                    } else {
+                        throw new IllegalArgumentException("You don't have enough rights");
+                    }
+                } else {
+                    throw new IllegalArgumentException("You delete this location. Change location id to replace");
+                }
             } else {
-                throw new IllegalArgumentException("You don't have enough rights");
+                throw new IllegalArgumentException("Location to replace with this id not found");
             }
         } else {
             throw new IllegalArgumentException("Location with this id not found");

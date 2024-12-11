@@ -73,12 +73,13 @@ public class LocationController {
 
     @POST
     @Path("/delete/{id}")
-    public Response deleteLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId) {
+    public Response deleteLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId, @QueryParam("replace") String repl) {
+        Long replaceId = Long.parseLong(repl);
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
             String username = userPrincipal.getName();
             String action = "delete";
-            locationService.deleteLocation(locationId, username);
+            locationService.deleteLocation(locationId, username, replaceId);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         } catch (IllegalArgumentException e) {
