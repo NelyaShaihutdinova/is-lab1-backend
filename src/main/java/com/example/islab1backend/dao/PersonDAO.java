@@ -49,7 +49,7 @@ public class PersonDAO {
         if (person != null) {
             Person replace = em.find(Person.class, replaceId);
             if (replace != null) {
-                if (personId != replaceId) {
+                if (!Objects.equals(personId, replaceId)) {
                     if (Objects.equals(person.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                         em.createQuery("UPDATE Ticket t SET t.person.id = :replaceId WHERE t.person.id = :personId")
                                 .setParameter("replaceId", replaceId).setParameter("personId", personId)

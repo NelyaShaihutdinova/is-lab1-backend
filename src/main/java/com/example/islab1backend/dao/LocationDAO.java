@@ -46,7 +46,7 @@ public class LocationDAO {
         if (location != null) {
             Location replace = em.find(Location.class, replaceId);
             if (replace != null) {
-                if (locationId != replaceId) {
+                if (!Objects.equals(locationId, replaceId)) {
                     if (Objects.equals(location.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                         em.createQuery("UPDATE Person p SET p.location.id = :replaceId WHERE p.location.id = :locationId")
                                 .setParameter("replaceId", replaceId).setParameter("locationId", locationId)

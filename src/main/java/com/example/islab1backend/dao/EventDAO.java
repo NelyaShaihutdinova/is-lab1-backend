@@ -48,7 +48,7 @@ public class EventDAO {
         if (event != null) {
             Event replace = em.find(Event.class, replaceId);
             if (replace != null) {
-                if (eventId != replaceId) {
+                if (!Objects.equals(eventId, replaceId)) {
                     if (Objects.equals(event.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                         em.createQuery("UPDATE Ticket t SET t.event.id = :replaceId WHERE t.event.id = :eventId")
                                 .setParameter("replaceId", replaceId).setParameter("eventId", eventId)

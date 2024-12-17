@@ -46,7 +46,7 @@ public class CoordinatesDAO {
         if (coordinates != null) {
             Coordinates replace = em.find(Coordinates.class, replaceId);
             if (replace != null) {
-                if (coordinatesId != replaceId) {
+                if (!Objects.equals(coordinatesId, replaceId)) {
                     if (Objects.equals(coordinates.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                         em.createQuery("UPDATE Ticket t SET t.coordinates.id = :replaceId WHERE t.coordinates.id = :coordinatesId")
                                 .setParameter("replaceId", replaceId).setParameter("coordinatesId", coordinatesId)
@@ -56,7 +56,7 @@ public class CoordinatesDAO {
                         throw new IllegalArgumentException("You don't have enough rights");
                     }
                 } else {
-                    throw new IllegalArgumentException("You delete this coordinates. Change coordinates id to replace");
+                    throw new IllegalArgumentException("Change coordinates id to replace");
                 }
             } else {
                 throw new IllegalArgumentException("Coordinates to replace with this id not found");

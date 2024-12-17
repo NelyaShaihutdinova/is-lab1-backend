@@ -14,6 +14,7 @@
         <class>com.example.islab1backend.models.Person</class>
         <class>com.example.islab1backend.models.Ticket</class>
         <class>com.example.islab1backend.models.Venue</class>
+        <class>com.example.islab1backend.models.ImportHistory</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://is-lab1-backend:5432/your_database"/>

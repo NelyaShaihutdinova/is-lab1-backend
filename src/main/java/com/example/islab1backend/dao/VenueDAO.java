@@ -46,7 +46,7 @@ public class VenueDAO {
         if (venue != null) {
             Venue replace = em.find(Venue.class, replaceId);
             if (replace != null) {
-                if (venueId != replaceId) {
+                if (!Objects.equals(venueId, replaceId)) {
                     if (Objects.equals(venue.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                         em.createQuery("UPDATE Ticket t SET t.venue.id = :replaceId WHERE t.venue.id = :venueId")
                                 .setParameter("replaceId", replaceId).setParameter("venueId", venueId)
