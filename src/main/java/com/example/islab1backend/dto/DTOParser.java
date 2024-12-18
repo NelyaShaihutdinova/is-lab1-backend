@@ -2,6 +2,7 @@ package com.example.islab1backend.dto;
 
 import com.example.islab1backend.dto.requests.PersonRequest;
 import com.example.islab1backend.dto.requests.TicketRequest;
+import com.example.islab1backend.dto.responses.HistoryResponse;
 import com.example.islab1backend.models.*;
 import com.example.islab1backend.services.*;
 
@@ -51,5 +52,16 @@ public class DTOParser {
         ticket.setVenue(venue);
         ticket.setCreationBy(username);
         return ticket;
+    }
+
+    public HistoryResponse parseResponseHistory(ImportHistory importHistory) {
+        HistoryResponse historyResponse = new HistoryResponse();
+        historyResponse.setId(importHistory.getId());
+        historyResponse.setFileName(importHistory.getFileName());
+        historyResponse.setUsername(importHistory.getUsername());
+        historyResponse.setImportTime(importHistory.getImportTime().toString());
+        historyResponse.setNumberOfImportedRecords(importHistory.getNumberOfImportedRecords());
+        historyResponse.setStatus(importHistory.getStatus());
+        return historyResponse;
     }
 }

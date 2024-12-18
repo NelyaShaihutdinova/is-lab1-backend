@@ -3,10 +3,13 @@ package com.example.islab1backend.controllers;
 import com.example.islab1backend.dto.DTOParser;
 import com.example.islab1backend.dto.requests.TicketRequest;
 import com.example.islab1backend.dto.responses.ErrorResponse;
+import com.example.islab1backend.filters.TicketValidator;
 import com.example.islab1backend.models.Ticket;
 import com.example.islab1backend.services.*;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -40,6 +43,10 @@ public class TicketController {
     private EventService eventService;
 
     private final DTOParser parser = new DTOParser();
+    private final TicketValidator ticketValidator = new TicketValidator();
+
+    @PersistenceContext
+    private EntityManager em;
 
     @POST
     @Path("/create")
@@ -49,6 +56,9 @@ public class TicketController {
             String username = userPrincipal.getName();
             Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
             String action = "create";
+            ticketValidator.validateUniqueTicketNameInEvent(em, ticket);
+            ticketValidator.validateDiscountLimit(em, ticket);
+            ticketValidator.validateVenueCapacity(em, ticket);
             ticketService.createTicket(ticket);
             auditService.saveAudit(username, action);
             return Response.ok().build();
@@ -67,6 +77,9 @@ public class TicketController {
             String username = userPrincipal.getName();
             Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
             String action = "update";
+            ticketValidator.validateUniqueTicketNameInEvent(em, ticket);
+            ticketValidator.validateDiscountLimit(em, ticket);
+            ticketValidator.validateVenueCapacity(em, ticket);
             ticketService.updateTicket(ticketId, ticket, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
