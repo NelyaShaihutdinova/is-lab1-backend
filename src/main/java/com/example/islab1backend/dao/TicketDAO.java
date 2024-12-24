@@ -1,5 +1,6 @@
 package com.example.islab1backend.dao;
 
+import com.example.islab1backend.filters.TicketValidator;
 import com.example.islab1backend.models.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -22,12 +23,20 @@ public class TicketDAO {
     @Inject
     private UserDAO userDAO;
 
-    public void save(Ticket ticket) {
-        em.persist(ticket);
+    private final TicketValidator ticketValidator = new TicketValidator();
+
+    public void save(EntityManager entityManager, Ticket ticket) {
+        ticketValidator.validateUniqueTicketNameInEvent(entityManager, ticket);
+        ticketValidator.validateDiscountLimit(entityManager, ticket);
+        ticketValidator.validateVenueCapacity(entityManager, ticket);
+        entityManager.persist(ticket);
     }
 
-    public void update(Long ticketId, String name, Coordinates coordinates, Person person, Event event, int price, TicketType ticketType, Long discount, float number, String comment, boolean refundable, Venue venue, String username) {
-        Ticket ticket = em.find(Ticket.class, ticketId);
+    public void update(EntityManager entityManager, Long ticketId, String name, Coordinates coordinates, Person person, Event event, int price, TicketType ticketType, Long discount, float number, String comment, boolean refundable, Venue venue, String username) {
+        Ticket ticket = entityManager.find(Ticket.class, ticketId);
+        ticketValidator.validateUniqueTicketNameInEvent(entityManager, ticket);
+        ticketValidator.validateDiscountLimit(entityManager, ticket);
+        ticketValidator.validateVenueCapacity(entityManager, ticket);
         if (ticket != null) {
             if (Objects.equals(ticket.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                 ticket.setName(name);

@@ -4,6 +4,7 @@ import com.example.islab1backend.dao.TicketDAO;
 import com.example.islab1backend.models.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -14,12 +15,12 @@ public class TicketService {
     private TicketDAO ticketDAO;
 
     @Transactional
-    public void createTicket(Ticket ticket) {
-        ticketDAO.save(ticket);
+    public void createTicket(EntityManager em, Ticket ticket) {
+        ticketDAO.save(em ,ticket);
     }
 
     @Transactional
-    public void updateTicket(Long ticketId, Ticket ticket, String username) {
+    public void updateTicket(EntityManager em, Long ticketId, Ticket ticket, String username) {
         String name = ticket.getName();
         Coordinates coordinates = ticket.getCoordinates();
         Person person = ticket.getPerson();
@@ -31,7 +32,7 @@ public class TicketService {
         String comment = ticket.getComment();
         boolean refundable = ticket.isRefundable();
         Venue venue = ticket.getVenue();
-        ticketDAO.update(ticketId, name, coordinates, person, event, price, ticketType, discount, number, comment, refundable, venue, username);
+        ticketDAO.update(em, ticketId, name, coordinates, person, event, price, ticketType, discount, number, comment, refundable, venue, username);
     }
 
     @Transactional

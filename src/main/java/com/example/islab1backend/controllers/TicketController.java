@@ -56,16 +56,13 @@ public class TicketController {
             String username = userPrincipal.getName();
             Ticket ticket = parser.parseTicket(ticketRequest, venueService, personService, coordinatesService, eventService, username);
             String action = "create";
-            ticketValidator.validateUniqueTicketNameInEvent(em, ticket);
-            ticketValidator.validateDiscountLimit(em, ticket);
-            ticketValidator.validateVenueCapacity(em, ticket);
-            ticketService.createTicket(ticket);
+            ticketService.createTicket(em ,ticket);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(new ErrorResponse(e.getMessage())).build();
         }
     }
 
@@ -80,7 +77,7 @@ public class TicketController {
             ticketValidator.validateUniqueTicketNameInEvent(em, ticket);
             ticketValidator.validateDiscountLimit(em, ticket);
             ticketValidator.validateVenueCapacity(em, ticket);
-            ticketService.updateTicket(ticketId, ticket, username);
+            ticketService.updateTicket(em, ticketId, ticket, username);
             auditService.saveAudit(username, action);
             return Response.ok().build();
         } catch (IllegalArgumentException e) {

@@ -3,6 +3,7 @@ package com.example.islab1backend.services;
 import com.example.islab1backend.dao.*;
 import com.example.islab1backend.filters.TicketValidator;
 import com.example.islab1backend.models.*;
+import io.minio.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -14,6 +15,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,20 @@ public class ImportService {
     private CoordinatesDAO coordinatesDAO;
 
     private final TicketValidator ticketValidator = new TicketValidator();
+
+    private static final String MINIO_URL = "http://localhost:9000";
+    private static final String ACCESS_KEY = "BEyYetZNx01i3omeO0VF";
+    private static final String SECRET_KEY = "MngozocMiy1WzqhbqRrK3shoVpUIIoLYF7AeP8qR";
+
+    private final MinioClient minioClient;
+
+    public ImportService() {
+        this.minioClient = MinioClient.builder()
+                .endpoint(MINIO_URL)
+                .credentials(ACCESS_KEY, SECRET_KEY)
+                .build();
+    }
+
 
     @Transactional
     public List<ImportHistory> getHistory(String username, int pageNumber, int pageSize, String filterValue, String filterField, String sorted) {
@@ -82,6 +98,35 @@ public class ImportService {
     }
 
     @Transactional
+    public void importUserFile(String username, List<Ticket> tickets, String fileName, InputStream fileInputStream) {
+        String bucketName = "user-" + username;
+        try {
+            importObjects(username, tickets, fileName);
+        } catch  (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Database error during import!");
+        }
+
+//        if (true) {
+//            throw new RuntimeException("Simulated business logic exception after DB insert but before file upload");
+//        }
+
+        try {
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .contentType("application/json")
+                    .stream(fileInputStream, fileInputStream.available(),  -1)
+                    .build());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect to file storage!");
+        }
+    }
+
     public ImportHistory importObjects(String username, List<Ticket> tickets, String fileName) {
         ImportHistory history = new ImportHistory();
         history.setFileName(fileName);
@@ -149,5 +194,49 @@ public class ImportService {
     @Transactional
     public void save(ImportHistory history) {
         em.persist(history);
+    }
+
+    @Transactional
+    public ImportHistory findById(Long importId) {
+        return em.find(ImportHistory.class, importId);
+    }
+
+    @Transactional
+    public String getFileNameById(Long importId) {
+        ImportHistory history = findById(importId);
+        return history.getFileName();
+    }
+
+    public InputStream downloadFile(String currentUsername, Long importId) {
+        ImportHistory history = findById(importId);
+        String fileName = history.getFileName();
+        if (history.getStatus() == ImportStatus.FAILED) {
+            throw new IllegalArgumentException("You cannot download this file because import is failed!");
+        }
+        if (!(Objects.equals(userDAO.findByUsername(currentUsername).get().getRole().toString(), "ADMIN"))) {
+            if (Objects.equals(history.getUsername(), currentUsername)) {
+                String bucketName = "user-" + currentUsername;
+                try {
+                    return minioClient.getObject(GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(fileName)
+                            .build());
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to download file from MinIO: " + e.getMessage(), e);
+                }
+            } else {
+                throw new IllegalArgumentException("You don't have enough rights");
+            }
+        } else {
+            String bucketName = "user-" + history.getUsername();
+            try {
+                return minioClient.getObject(GetObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(fileName)
+                        .build());
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to download file from MinIO: " + e.getMessage(), e);
+            }
+        }
     }
 }

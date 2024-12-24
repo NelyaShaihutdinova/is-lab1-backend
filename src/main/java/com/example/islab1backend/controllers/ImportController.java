@@ -17,6 +17,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -43,15 +45,17 @@ public class ImportController {
         String username = userPrincipal.getName();
         try {
             InputStream fileInputStream = file.getContent();
-            String json = IOUtils.toString(fileInputStream, StandardCharsets.UTF_8);
-
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IOUtils.copy(fileInputStream, baos);
+            InputStream fileStreamForDb = new ByteArrayInputStream(baos.toByteArray());
+            InputStream fileStreamForMinio = new ByteArrayInputStream(baos.toByteArray());
+            String json = IOUtils.toString(fileStreamForDb, StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
             List<Ticket> tickets = objectMapper.readValue(json,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, Ticket.class));
 
-            ImportHistory history = importService.importObjects(username, tickets, file.getFileName().orElseThrow());
-            HistoryResponse historyResponse = dtoParser.parseResponseHistory(history);
-            return Response.ok(historyResponse).build();
+            importService.importUserFile(username, tickets, file.getFileName().orElseThrow(), fileStreamForMinio);
+            return Response.ok().build();
         } catch (IllegalArgumentException e) {
             ImportHistory history = new ImportHistory();
             history.setFileName(file.getFileName().orElseThrow());
@@ -60,7 +64,7 @@ public class ImportController {
             history.setStatus(ImportStatus.FAILED);
             history.setNumberOfImportedRecords(0);
             importService.save(history);
-            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(e.getMessage())).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Import failed: " + e.getMessage()).build();
         } catch (Exception e) {
             ImportHistory history = new ImportHistory();
             history.setFileName(file.getFileName().orElseThrow());
@@ -91,5 +95,23 @@ public class ImportController {
             historyResponseList.add(historyResponse);
         }
         return Response.ok(historyResponseList).build();
+    }
+
+    @POST
+    @Path("/download/{id}")
+    public Response downloadFile(@Context SecurityContext securityContext, @PathParam("id") Long importId) {
+        try {
+            Principal userPrincipal = securityContext.getUserPrincipal();
+            String username = userPrincipal.getName();
+            InputStream fileStream = importService.downloadFile(username, importId);
+
+            return Response.ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                    .header("Content-Disposition", "attachment; filename=\"" + importService.getFileNameById(importId) + "\"")
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Failed to download file: " + e.getMessage())
+                    .build();
+        }
     }
 }
