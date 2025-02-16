@@ -36,11 +36,6 @@ public class TicketService {
     }
 
     @Transactional
-    public Ticket getTicket(Long ticketId) {
-        return ticketDAO.findById(ticketId);
-    }
-
-    @Transactional
     public void deleteTicket(Long ticketId, String username) {
         ticketDAO.delete(ticketId, username);
     }

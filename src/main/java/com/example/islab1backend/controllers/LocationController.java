@@ -27,7 +27,6 @@ public class LocationController {
     private AuditService auditService;
 
     @POST
-    @Path("/create")
     public Response createLocation(@Context SecurityContext securityContext, Location location) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -45,7 +44,7 @@ public class LocationController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updateLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId, Location location) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -61,18 +60,8 @@ public class LocationController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId) {
-        try {
-            return Response.ok(locationService.getLocation(locationId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deleteLocation(@Context SecurityContext securityContext, @PathParam("id") Long locationId, @QueryParam("replace") String repl) {
         Long replaceId = Long.parseLong(repl);
         try {
@@ -90,7 +79,6 @@ public class LocationController {
     }
 
     @GET
-    @Path("/show")
     public Response showAllLocation(@QueryParam("page") @DefaultValue("1") int page,
                                     @QueryParam("size") @DefaultValue("10") int size) {
         List<Location> locations = locationService.getLocationPage(page, size);

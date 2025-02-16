@@ -34,9 +34,6 @@ public class TicketDAO {
 
     public void update(EntityManager entityManager, Long ticketId, String name, Coordinates coordinates, Person person, Event event, int price, TicketType ticketType, Long discount, float number, String comment, boolean refundable, Venue venue, String username) {
         Ticket ticket = entityManager.find(Ticket.class, ticketId);
-        ticketValidator.validateUniqueTicketNameInEvent(entityManager, ticket);
-        ticketValidator.validateDiscountLimit(entityManager, ticket);
-        ticketValidator.validateVenueCapacity(entityManager, ticket);
         if (ticket != null) {
             if (Objects.equals(ticket.getCreationBy(), username) || Objects.equals(userDAO.findByUsername(username).get().getRole().toString(), "ADMIN")) {
                 ticket.setName(name);

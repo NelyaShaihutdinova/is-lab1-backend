@@ -27,7 +27,6 @@ public class CoordinatesController {
     private AuditService auditService;
 
     @POST
-    @Path("/create")
     public Response createCoordinates(@Context SecurityContext securityContext, Coordinates coordinates) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -45,7 +44,7 @@ public class CoordinatesController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updateCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId, Coordinates coordinates) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -61,18 +60,8 @@ public class CoordinatesController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId) {
-        try {
-            return Response.ok(coordinatesService.getCoordinates(coordinatesId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deleteCoordinates(@Context SecurityContext securityContext, @PathParam("id") Long coordinatesId, @QueryParam("replace") String repl) {
         Long replaceId = Long.parseLong(repl);
         try {
@@ -90,7 +79,6 @@ public class CoordinatesController {
     }
 
     @GET
-    @Path("/show")
     public Response getAllCoordinates(@QueryParam("page") @DefaultValue("1") int page,
                                @QueryParam("size") @DefaultValue("10") int size){
         List<Coordinates> coordinates = coordinatesService.getCoordinatesPage(page, size);

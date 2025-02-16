@@ -49,7 +49,6 @@ public class TicketController {
     private EntityManager em;
 
     @POST
-    @Path("/create")
     public Response createTicket(@Context SecurityContext securityContext, TicketRequest ticketRequest) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -67,7 +66,7 @@ public class TicketController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updateTicket(@Context SecurityContext securityContext, @PathParam("id") Long ticketId, TicketRequest ticketRequest) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -87,18 +86,8 @@ public class TicketController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getTicket(@Context SecurityContext securityContext, @PathParam("id") Long ticketId) {
-        try {
-            return Response.ok(ticketService.getTicket(ticketId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deleteTicket(@Context SecurityContext securityContext, @PathParam("id") Long ticketId) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -115,7 +104,6 @@ public class TicketController {
     }
 
     @GET
-    @Path("/show")
     public Response showAllTicket(@QueryParam("page") @DefaultValue("1") int page,
                                   @QueryParam("size") @DefaultValue("10") int size,
                                   @QueryParam("filter-value") String filter,

@@ -27,7 +27,6 @@ public class VenueController {
     private AuditService auditService;
 
     @POST
-    @Path("/create")
     public Response createVenue(@Context SecurityContext securityContext, Venue venue) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -45,7 +44,7 @@ public class VenueController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updateVenue(@Context SecurityContext securityContext, @PathParam("id") Long venueId, Venue venue) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -61,18 +60,8 @@ public class VenueController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getVenue(@Context SecurityContext securityContext, @PathParam("id") Long venueId) {
-        try {
-            return Response.ok(venueService.getVenue(venueId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deleteVenue(@Context SecurityContext securityContext, @PathParam("id") Long venueId, @QueryParam("replace") String repl) {
         Long replaceId = Long.parseLong(repl);
         try {
@@ -90,7 +79,6 @@ public class VenueController {
     }
 
     @GET
-    @Path("/show")
     public Response showAllVenue(@QueryParam("page") @DefaultValue("1") int page,
                                  @QueryParam("size") @DefaultValue("10") int size) {
         List<Venue> venues = venueService.getVenuePage(page, size);

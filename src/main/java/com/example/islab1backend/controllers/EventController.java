@@ -27,7 +27,6 @@ public class EventController {
     private AuditService auditService;
 
     @POST
-    @Path("/create")
     public Response createEvent(@Context SecurityContext securityContext, Event event) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -45,7 +44,7 @@ public class EventController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updateEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId, Event event) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -61,18 +60,8 @@ public class EventController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId) {
-        try {
-            return Response.ok(eventService.getEvent(eventId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deleteEvent(@Context SecurityContext securityContext, @PathParam("id") Long eventId, @QueryParam("replace") String repl) {
         Long replaceId = Long.parseLong(repl);
         try {
@@ -90,7 +79,6 @@ public class EventController {
     }
 
     @GET
-    @Path("/show")
     public Response showAllEvent(@QueryParam("page") @DefaultValue("1") int page,
                                  @QueryParam("size") @DefaultValue("10") int size) {
         List<Event> events = eventService.getEventPage(page, size);

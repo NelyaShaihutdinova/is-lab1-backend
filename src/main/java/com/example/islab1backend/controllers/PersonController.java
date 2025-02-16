@@ -35,7 +35,6 @@ public class PersonController {
     private final DTOParser parser = new DTOParser();
 
     @POST
-    @Path("/create")
     public Response createPerson(@Context SecurityContext securityContext, PersonRequest personRequest) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -53,7 +52,7 @@ public class PersonController {
     }
 
     @POST
-    @Path("/update/{id}")
+    @Path("/{id}")
     public Response updatePerson(@Context SecurityContext securityContext, @PathParam("id") Long personId, PersonRequest personRequest) {
         try {
             Principal userPrincipal = securityContext.getUserPrincipal();
@@ -70,18 +69,8 @@ public class PersonController {
         }
     }
 
-    @GET
-    @Path("/info/{id}")
-    public Response getPerson(@Context SecurityContext securityContext, @PathParam("id") Long personId) {
-        try {
-            return Response.ok(personService.getPerson(personId)).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid data").build();
-        }
-    }
-
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Response deletePerson(@Context SecurityContext securityContext, @PathParam("id") Long personId, @QueryParam("replace") String repl) {
         Long replaceId = Long.parseLong(repl);
         try {
@@ -99,7 +88,6 @@ public class PersonController {
     }
 
     @GET
-    @Path("/show")
     public Response showAllPerson(@QueryParam("page") @DefaultValue("1") int page,
                                   @QueryParam("size") @DefaultValue("10") int size) {
         List<Person> personList = personService.getPersonPage(page, size);

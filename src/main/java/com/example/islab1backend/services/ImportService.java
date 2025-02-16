@@ -50,8 +50,8 @@ public class ImportService {
     private final TicketValidator ticketValidator = new TicketValidator();
 
     private static final String MINIO_URL = "http://localhost:9000";
-    private static final String ACCESS_KEY = "BEyYetZNx01i3omeO0VF";
-    private static final String SECRET_KEY = "MngozocMiy1WzqhbqRrK3shoVpUIIoLYF7AeP8qR";
+    private static final String ACCESS_KEY = "cXZWB6Xs7Dx8VLCAFNHy";
+    private static final String SECRET_KEY = "IadRc2fQJ27t64NlKn8AHEotNMmaDgz5PYujL0rH";
 
     private final MinioClient minioClient;
 
